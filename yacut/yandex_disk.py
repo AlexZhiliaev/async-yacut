@@ -9,7 +9,7 @@ from .constants import DOWNLOAD_LINK_URL, REQUEST_UPLOAD_URL
 
 async def async_upload_files_to_disk(
         files: list[FileStorage]
-) -> list[tuple[str | None, str]]:
+) -> list[tuple[str, str]]:
     """Асинхронная загрузка файлов на Яндекс.Диск"""
     disk_token = app.config['DISK_TOKEN']
 
@@ -30,7 +30,7 @@ async def upload_single_file(
         session: aiohttp.ClientSession,
         file: FileStorage,
         headers: dict[str, str]
-) -> tuple[str | None, str]:
+) -> tuple[str, str]:
     """Загрузка одного файла на Яндекс.Диск"""
     filename = file.filename
     params = {
