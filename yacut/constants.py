@@ -5,6 +5,10 @@ import string
 SHORT_ID_LENGTH = 6
 SHORT_ID_MAX_LENGTH = 16
 SHORT_ID_CHARS = string.ascii_letters + string.digits
+SHORT_ID_PATTERN = r'^[A-Za-z0-9]+$'
+
+# Имена view-функций
+REDIRECT_VIEW_NAME = 'redirect_to_original'
 
 # Зарезервированные имена коротких ссылок.
 RESERVED_SHORT_IDS = {'files'}

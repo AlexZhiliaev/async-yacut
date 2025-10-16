@@ -1,9 +1,10 @@
 from flask import flash, redirect, render_template
+from wtforms import ValidationError
 
 from . import app, db
 from .forms import FileUploadForm, URLMapForm
 from .models import URLMap
-from .utils import get_unique_short_id
+from .validators import validate_custom_id, validate_url
 from .yandex_disk import async_upload_files_to_disk
 
 
@@ -12,13 +13,19 @@ def index_view():
     """Главная страница - создание короткой ссылки."""
     form = URLMapForm()
     if form.validate_on_submit():
-        original_url = form.original_link.data
-        custom_id = form.custom_id.data
-        short_id = custom_id.strip() if custom_id else get_unique_short_id()
-        url_map = URLMap(original=original_url, short=short_id)
-        db.session.add(url_map)
-        db.session.commit()
-        return render_template('index.html', form=form, short_id=short_id)
+        try:
+            url_map = URLMap.create(
+                original_url=form.original_link.data,
+                custom_id=form.custom_id.data,
+                url_validator=validate_url,
+                custom_id_validator=validate_custom_id,
+            )
+            return render_template(
+                'index.html',
+                form=form,
+                short_id=url_map.short)
+        except ValidationError as e:
+            flash(f'Ошибка валидации: {str(e)}')
     return render_template('index.html', form=form)
 
 
@@ -32,7 +39,7 @@ async def upload_files():
             results = []
 
             for filename, file_url in file_results:
-                short_id = get_unique_short_id()
+                short_id = URLMap.get_unique_short_id()
                 url_map = URLMap(original=file_url, short=short_id)
                 db.session.add(url_map)
                 results.append({

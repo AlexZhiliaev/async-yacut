@@ -1,4 +1,5 @@
 import asyncio
+from http import HTTPStatus
 
 import aiohttp
 from werkzeug.datastructures import FileStorage
@@ -43,7 +44,7 @@ async def upload_single_file(
         headers=headers,
         params=params,
     ) as response:
-        if response.status != 200:
+        if response.status != HTTPStatus.OK:
             raise Exception(
                 f'Ошибка получения ссылки для загрузки: {response.status}')
 
@@ -56,7 +57,7 @@ async def upload_single_file(
         data=file_data,
         headers={'Content-Type': 'application/octet-stream'}
     ) as response:
-        if response.status not in (201, 202):
+        if response.status not in (HTTPStatus.CREATED, HTTPStatus.ACCEPTED):
             raise Exception(f'Ошибка загрузки файла: {response.status}')
 
     async with session.get(
@@ -64,7 +65,7 @@ async def upload_single_file(
         headers=headers,
         params={'path': f'app:/{filename}'}
     ) as response:
-        if response.status != 200:
+        if response.status != HTTPStatus.OK:
             raise Exception(
                 f'Ошибка получения ссылки для скачивания: {response.status}')
         download_data = await response.json()

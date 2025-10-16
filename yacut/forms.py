@@ -3,8 +3,6 @@ from flask_wtf.file import MultipleFileField
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Optional
 
-from .validators import validate_custom_id, validate_url
-
 
 class URLMapForm(FlaskForm):
     """Форма для создания короткой ссылки."""
@@ -18,15 +16,6 @@ class URLMapForm(FlaskForm):
         validators=[Optional()],
     )
     submit = SubmitField('Создать')
-
-    def validate_original_link(self, field):
-        """Проверяет валидность URL."""
-        validate_url(field.data)
-
-    def validate_custom_id(self, field):
-        """Проверяет валидность пользовательского короткого идентификатора."""
-        if field.data:
-            validate_custom_id(field.data)
 
 
 class FileUploadForm(FlaskForm):
